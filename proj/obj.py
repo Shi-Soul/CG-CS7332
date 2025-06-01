@@ -26,6 +26,7 @@ class Mesh:
     faces: np.ndarray         # [Nf, 3] face vertex indices
     vertex_normals: np.ndarray  # [Nv, 3] vertex normals
     face_normals: np.ndarray    # [Nf, 3] face normals
+    
     _str_: str = ""           # string representation
     
     def compute_normals(self):

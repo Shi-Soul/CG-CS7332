@@ -21,3 +21,6 @@ class Scene:
     lights: List[Light]
     objects: List[Object]
     camera: Camera
+    
+
+    
