@@ -62,6 +62,7 @@ def ProjectScene(collapsed_scene: CollapsedScene)->np.ndarray:
     camera_to_world[:3, 3] = camera.viewpoint
     cross_direction = np.cross(camera.up, camera.direction)
     camera_to_world[:3, :3] = np.column_stack([-camera.up, -cross_direction, camera.direction])
+    camera_to_world[:3] /= np.linalg.norm(camera_to_world[:3], axis=1, keepdims=True)
     # camera_to_world[:3, :3] = np.column_stack([cross_direction, camera.up, camera.direction])
     
     world_to_camera = np.linalg.inv(camera_to_world)

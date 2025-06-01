@@ -21,13 +21,12 @@ cube = Object(
     material=material
 )
 
-light = Light(np.array([0, 0, 0]), 1, np.array([1, 1, 1]))
+light = Light(np.array([-2, -1.5, 1.2]), 1, np.array([1, 1, 1]))
 
-camera = Camera(np.array([0, 0, 0]), np.array([0, 0, 1]), np.array([0, 1, 0]), 45, 1.5, 800)
+camera = Camera(np.array([-3, -3, 3]), np.array([1, 1, -1]), np.array([0, 0, 1]), 52, 1.5, 800)
 
 image_size = GetImageSize(camera)
 
-Display.init(*image_size, title="Phong Illumination")
 
 
 scene = Scene(
@@ -44,6 +43,9 @@ image = Rasterize(illuminated_scene)
 # image = np.zeros((image_size[1], image_size[0], 3), dtype=np.uint8)
 
 
+Display.init(*image_size, title="Phong Illumination")
 Display.show(image)
+print("Done")
+
 
 sleep(10)
