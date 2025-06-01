@@ -17,11 +17,11 @@ material = Material(
 )
 
 cube = Object(
-    mesh=Triangle(np.array([2, 0, 0]), np.array([2, 0.5, 0]), np.array([2, 0, 0.5])),
+    mesh=Triangle(np.array([2, -0.3, -0.3]), np.array([2, 0.5, 0]), np.array([2, 0, 0.5])),
     material=material
 )
 
-light = Light(np.array([0, 0, 0]), 1, np.array([1, 1, 1]))
+light = Light(np.array([0, 0, 0]), 1, np.array([1, 0.5, 1]))
 
 camera = Camera(np.array([0, 0, 0]), np.array([1, 0, 0]), np.array([0, 0, 1]), 45, 1.5, 800)
 
@@ -37,11 +37,11 @@ scene = Scene(
 )
 
 
-# illuminated_scene = Illuminate(scene)
-illuminated_scene = IlluminatedScene(
-    objects=[IlluminatedObject(object, np.array([0.3, 0.8, 0.5]).reshape(1,3).repeat(object.mesh.vertices.shape[0], axis=0)) for object in scene.objects],
-    camera=scene.camera
-)
+illuminated_scene = Illuminate(scene)
+# illuminated_scene = IlluminatedScene(
+#     objects=[IlluminatedObject(object, np.array([0.3, 0.8, 0.5]).reshape(1,3).repeat(object.mesh.vertices.shape[0], axis=0)) for object in scene.objects],
+#     camera=scene.camera
+# )
 
 
 image = Rasterize(illuminated_scene)
