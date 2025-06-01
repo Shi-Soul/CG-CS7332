@@ -16,6 +16,7 @@ class Display:
         Display._height = h
         pygame.init()
         pygame.display.set_caption(title)
+
         Display._window = pygame.display.set_mode((w, h))
         if not os.path.exists(Display._record_dir):
             os.makedirs(Display._record_dir)
