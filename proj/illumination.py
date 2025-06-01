@@ -5,17 +5,17 @@ from typing import List
 from scene import Scene, Object, Light, Camera
 
 @dataclass
-class IlluinatedObject:
+class IlluminatedObject:
     object: Object
     vertex_colors: np.ndarray # [Nv, 3] We adopt Gouraud shading and Phong illumination model
     
 @dataclass
 class IlluminatedScene:
-    objects: List[IlluinatedObject]
+    objects: List[IlluminatedObject]
     camera: Camera
 
 
-def phong_illuminate_object(object: Object, lights: List[Light], camera: Camera) -> IlluinatedObject:
+def phong_illuminate_object(object: Object, lights: List[Light], camera: Camera) -> IlluminatedObject:
     ...
     raise NotImplementedError("Not implemented")
 
