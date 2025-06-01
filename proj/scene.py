@@ -9,10 +9,11 @@ from obj import Object, Light
 class Camera:
     viewpoint: np.ndarray
     direction: np.ndarray
-    up: np.ndarray = np.array([0, 0, 1]) 
+    up: np.ndarray# = np.array([0, 0, 1]) 
     fov: float # in degrees, vertical field of view, 0 < fov < 180
     aspect: float # width / height
-    near: float # near clipping plane
+    # near: float # near clipping plane
+    resolution: float # resolution of the image # pixels per meter
 
 
 

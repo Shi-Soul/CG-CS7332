@@ -17,6 +17,7 @@ class IlluminatedScene:
 
 def phong_illuminate_object(object: Object, lights: List[Light], camera: Camera) -> IlluinatedObject:
     ...
+    raise NotImplementedError("Not implemented")
 
 
 def Illuminate(scene: Scene) -> IlluminatedScene:

@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     for t in range(10):
         img = np.zeros((h, w, 3), dtype=np.uint8)
-        img[:, :, 0] = int(255 * (t / 10))  # Red channel increase
+        img[20:80, :30, 0] = int(255 * (t / 10))  # Red channel increase
         # Display.record(t, img)
         Display.show(img)
         time.sleep(0.2)

@@ -2,7 +2,9 @@
 from scene import Scene, Camera, Light
 from obj import *
 from illumination import Illuminate
-
+from raster import Rasterize, get_image_size
+from display import Display
+from time import sleep
 
 material = Material(
     ka=0.1,
@@ -14,7 +16,6 @@ material = Material(
     color=np.array([1, 1, 1])
 )
 
-
 cube = Object(
     mesh=Cube(np.array([0, 0, 0]), 1),
     material=material
@@ -22,7 +23,12 @@ cube = Object(
 
 light = Light(np.array([0, 0, 0]), 1, np.array([1, 1, 1]))
 
-camera = Camera(np.array([0, 0, 0]), np.array([0, 0, 1]), np.array([0, 1, 0]), 45, 1, 0.1)
+camera = Camera(np.array([0, 0, 0]), np.array([0, 0, 1]), np.array([0, 1, 0]), 45, 1.5, 800)
+
+image_size = get_image_size(camera)
+
+Display.init(*image_size, title="Phong Illumination")
+
 
 scene = Scene(
     objects=[cube],
@@ -33,5 +39,11 @@ scene = Scene(
 
 illuminated_scene = Illuminate(scene)
 
+image = Rasterize(illuminated_scene)
+
+# image = np.zeros((image_size[1], image_size[0], 3), dtype=np.uint8)
 
 
+Display.show(image)
+
+sleep(10)

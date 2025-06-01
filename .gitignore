@@ -4,3 +4,8 @@
 
 *.blend1
 *.zip
+
+
+*__pycache__*
+*.pyc
+proj/frames
