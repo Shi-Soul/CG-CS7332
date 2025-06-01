@@ -2,7 +2,7 @@
 from scene import Scene, Camera, Light
 from obj import *
 from illumination import Illuminate
-from raster import Rasterize, get_image_size
+from raster import Rasterize, GetImageSize
 from display import Display
 from time import sleep
 
@@ -25,7 +25,7 @@ light = Light(np.array([0, 0, 0]), 1, np.array([1, 1, 1]))
 
 camera = Camera(np.array([0, 0, 0]), np.array([0, 0, 1]), np.array([0, 1, 0]), 45, 1.5, 800)
 
-image_size = get_image_size(camera)
+image_size = GetImageSize(camera)
 
 Display.init(*image_size, title="Phong Illumination")
 
