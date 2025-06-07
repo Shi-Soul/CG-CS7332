@@ -52,6 +52,7 @@ class Mesh:
                 norm = np.linalg.norm(avg_normal)
                 if norm > 0:  # Avoid division by zero
                     self.vertex_normals[i] = avg_normal / norm
+        return self
 
     def __str__(self):
         return self._str_
@@ -123,9 +124,7 @@ def Subdivide(mesh: Mesh, iterations: int = 1) -> Mesh:
             face_normals=None,
             _str_=f"Subdivided({current_mesh._str_})"
         )
-    current_mesh.compute_normals()
-    
-    return current_mesh
+    return current_mesh.compute_normals()
 
 def Triangle(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray) -> Mesh:
     """Create a triangle mesh from three points"""
@@ -136,8 +135,7 @@ def Triangle(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray) -> Mesh:
         face_normals=None,
         _str_=f"Triangle(p1={p1}, p2={p2}, p3={p3})"
     )
-    mesh.compute_normals()
-    return mesh
+    return mesh.compute_normals()
 
 
 def Cube(center: np.ndarray, size: float) -> Mesh:
@@ -174,8 +172,7 @@ def Cube(center: np.ndarray, size: float) -> Mesh:
         face_normals=None,
         _str_=f"Cube(center={center}, size={size})"
     )
-    mesh.compute_normals()
-    return mesh
+    return mesh.compute_normals()
 
 
 def Sphere(center: np.ndarray, radius: float, segments: int = 16) -> Mesh:
@@ -211,8 +208,7 @@ def Sphere(center: np.ndarray, radius: float, segments: int = 16) -> Mesh:
         face_normals=None,
         _str_=f"Sphere(center={center}, radius={radius}, segments={segments})"
     )
-    mesh.compute_normals()
-    return mesh
+    return mesh.compute_normals()
 
 
 def Cylinder(center: np.ndarray, radius: float, height: float, segments: int = 16) -> Mesh:
@@ -266,8 +262,7 @@ def Cylinder(center: np.ndarray, radius: float, height: float, segments: int = 1
         face_normals=None,
         _str_=f"Cylinder(center={center}, radius={radius}, height={height}, segments={segments})"
     )
-    mesh.compute_normals()
-    return mesh
+    return mesh.compute_normals()
 
 def Cone(center, radius, height, segments=16, vertical_segments=1) -> Mesh:
     # Generate vertices
@@ -321,13 +316,22 @@ def Cone(center, radius, height, segments=16, vertical_segments=1) -> Mesh:
         face_normals=None,
         _str_=f"Cone(center={center}, radius={radius}, height={height}, segments={segments}, vertical_segments={vertical_segments})"
     )
-    mesh.compute_normals()
-    return mesh
+    return mesh.compute_normals()
 
-def Polyhedron(vertices, faces) -> Mesh:
-    mesh = Mesh()
-    mesh.vertices = np.array(vertices)
-    mesh.faces = np.array(faces)
-    mesh._str_ = f"Polyhedron(vertices={len(vertices)}, faces={len(faces)})"
-    mesh.compute_normals()
-    return mesh
+def Polyhedron(vertices: np.ndarray, faces: np.ndarray) -> Mesh:
+    """Create a polyhedron mesh from vertices and faces
+    
+    Args:
+        vertices: Array of vertex positions [Nv, 3]
+        faces: Array of face vertex indices [Nf, 3]
+        
+    Returns:
+        Mesh object representing the polyhedron
+    """
+    return Mesh(
+        vertices=np.array(vertices),
+        faces=np.array(faces),
+        vertex_normals=None,
+        face_normals=None,
+        _str_=f"Polyhedron(vertices={len(vertices)}, faces={len(faces)})"
+    ).compute_normals()

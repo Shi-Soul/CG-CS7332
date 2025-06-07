@@ -32,7 +32,7 @@ def main():
     cube = Object(
         mesh=
             # Subdivide(
-                Cone(np.array([0, 0, 0]), 0.5, 1, 32, 4),
+                Cone(np.array([0, 0, 0]), 0.5, 1, 32, 8),
             # 3),
             # Subdivide(
             #     Cylinder(np.array([0, 0, 0]), 0.5, 1, 32),
