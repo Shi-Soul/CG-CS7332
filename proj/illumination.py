@@ -44,12 +44,12 @@ def phong_illuminate_object(object: Object, lights: List[Light], camera: Camera)
     
     # Diffuse component for all lights
     diffuse_intensities = np.maximum(0, np.sum(vertex_normals[:, None, :] * light_dirs, axis=2, keepdims=True))  # [Nv, Nl, 1]
-    diffuse = np.sum(material.kd * diffuse_intensities * light_colors[None, :, :] * S, axis=1)  # [Nv, 3]
+    diffuse = np.sum(material.kd * diffuse_intensities * light_colors[None, :, :] * material.color * S, axis=1)  # [Nv, 3]
     
     # Specular component for all lights
     reflect_dirs = 2 * np.sum(vertex_normals[:, None, :] * light_dirs, axis=2, keepdims=True) * vertex_normals[:, None, :] - light_dirs  # [Nv, Nl, 3]
     specular_intensities = np.maximum(0, np.sum(view_dirs[:, None, :] * reflect_dirs, axis=2, keepdims=True))  # [Nv, Nl, 1]
-    specular = np.sum(material.ks * (specular_intensities ** material.n) * light_colors[None, :, :] * S, axis=1)  # [Nv, 3]
+    specular = np.sum(material.ks * (specular_intensities ** material.n) * light_colors[None, :, :] * material.color * S, axis=1)  # [Nv, 3]
     
     # Combine components and apply material color
     vertex_colors = np.clip(ambient + diffuse + specular, 0, 1)
