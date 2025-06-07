@@ -209,7 +209,7 @@ def DiscretizeFrameBuffer(frame_buffer: np.ndarray)->np.ndarray:
 def Rasterize(illuminated_scene: IlluminatedScene)->np.ndarray:
     collapsed_scene = CollapseScene(illuminated_scene)
     projected_vertices = ProjectScene(collapsed_scene)
-    print(projected_vertices)
+    # print(projected_vertices)
         
     
     image_size = GetImageSize(illuminated_scene.camera)

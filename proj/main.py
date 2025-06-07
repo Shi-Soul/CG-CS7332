@@ -9,8 +9,8 @@ from time import sleep
 def main():
 
     material = Material(
-        ka=0.1,
-        kd=0.7,
+        ka=0.15,
+        kd=1.0,
         ks=0.8,
         n=10.0,
         a=1.0,
@@ -20,7 +20,7 @@ def main():
     )
     material_blue = Material(
         ka=0.2,
-        kd=0.7,
+        kd=1.0,
         ks=0.8,
         n=10.0,
         a=1.0,
@@ -31,16 +31,23 @@ def main():
 
     cube = Object(
         mesh=
+            # Subdivide(
+                Cone(np.array([0, 0, 0]), 0.5, 1, 32, 4),
+            # 3),
+            # Subdivide(
+            #     Cylinder(np.array([0, 0, 0]), 0.5, 1, 32),
+            # 1),
             # Sphere(np.array([0, 0, 0]), 0.5, 32),
-            Subdivide(
-                Cube(np.array([0, 0, 0]), 1), 
-            3),
+            # Subdivide(
+            #     Cube(np.array([0, 0, 0]), 1), 
+            # 3),
         material=material
     )
 
     light = Light(np.array([-0.7, -0.6, 0.8]), 1, np.array([1, 1, 1]))
 
-    observer = np.array([-5, -3.5, 3])/2
+    normalize = lambda x: x / np.linalg.norm(x)
+    observer = normalize(np.array([-5, -3.5, 3])) * 2.5
     camera = Camera(observer, -observer, np.array([0, 0, 1]), 60, 1.5, 800)
 
     image_size = GetImageSize(camera)
