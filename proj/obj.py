@@ -64,6 +64,66 @@ class Object:
     mesh: Mesh
 
 
+
+def Subdivide(mesh: Mesh, iterations: int = 1) -> Mesh:
+    """Subdivide the mesh by splitting each triangle into 4 smaller triangles
+    
+    Args:
+        mesh: Input mesh to subdivide
+        iterations: Number of subdivision iterations to perform (default: 1)
+    
+    Returns:
+        New mesh with subdivided geometry
+    """
+    current_mesh = mesh
+    
+    for _ in range(iterations):
+        vertices = current_mesh.vertices
+        faces = current_mesh.faces
+        
+        # Create new vertices by splitting edges
+        new_vertices = []
+        edge_to_vertex = {}  # Map edge to new vertex index
+        
+        for face in faces:
+            for i in range(3):
+                v1, v2 = face[i], face[(i + 1) % 3]
+                edge = tuple(sorted([v1, v2]))
+                if edge not in edge_to_vertex:
+                    # Create new vertex at midpoint
+                    mid = (vertices[v1] + vertices[v2]) / 2
+                    new_vertices.append(mid)
+                    edge_to_vertex[edge] = len(vertices) + len(new_vertices) - 1
+        
+        # Create new faces
+        new_faces = []
+        for face in faces:
+            v1, v2, v3 = face
+            # Get new vertices for each edge
+            v12 = edge_to_vertex[tuple(sorted([v1, v2]))]
+            v23 = edge_to_vertex[tuple(sorted([v2, v3]))]
+            v31 = edge_to_vertex[tuple(sorted([v3, v1]))]
+            
+            # Create 4 new triangles
+            new_faces.extend([
+                [v1, v12, v31],
+                [v12, v2, v23],
+                [v31, v23, v3],
+                [v12, v23, v31]
+            ])
+        
+        # Create new mesh with subdivided geometry
+        current_mesh = Mesh(
+            vertices=np.vstack([vertices, new_vertices]),
+            faces=np.array(new_faces),
+            vertex_normals=None,
+            face_normals=None,
+            _str_=f"Subdivided({current_mesh._str_})"
+        )
+        current_mesh.compute_normals()
+    
+    return current_mesh
+
 def Triangle(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray) -> Mesh:
     """Create a triangle mesh from three points"""
     mesh = Mesh(
