@@ -21,44 +21,38 @@ def phong_illuminate_object(object: Object, lights: List[Light], camera: Camera)
     vertex_normals = mesh.vertex_normals
     material = object.material
     
-    # Initialize vertex colors array
-    vertex_colors = np.zeros((len(vertices), 3))
-    
     # Calculate view direction for each vertex (from vertex to camera)
     view_dirs = camera.viewpoint - vertices
     view_dirs = view_dirs / np.linalg.norm(view_dirs, axis=1, keepdims=True)
     
-    # For each vertex, calculate illumination from all lights
-    for i, vertex in enumerate(vertices):
-        normal = vertex_normals[i]
-        view_dir = view_dirs[i]
-        
-        # Initialize color components
-        ambient = material.ka * material.color
-        diffuse = np.zeros(3)
-        specular = np.zeros(3)
-        
-        # Calculate contribution from each light
-        for light in lights:
-            # Light direction (from vertex to light)
-            light_dir = light.position - vertex
-            light_dist = np.linalg.norm(light_dir)
-            light_dir = light_dir / light_dist
-            
-            S = 1/(material.a  + material.b * light_dist + material.c * light_dist ** 2)
-            
-            # Diffuse component
-            diffuse_intensity = max(0, np.dot(normal, light_dir))
-            diffuse += material.kd * diffuse_intensity * light.color * light.intensity * S
-            
-            # Specular component
-            reflect_dir = 2 * np.dot(normal, light_dir) * normal - light_dir
-            specular_intensity = max(0, np.dot(view_dir, reflect_dir))
-            specular += material.ks * (specular_intensity ** material.n) * light.color * light.intensity * S
-        
-        # Combine components and apply material color
-        vertex_colors[i] = np.clip(ambient + diffuse + specular, 0, 1)
-    # breakpoint()
+    # Initialize color components
+    ambient = material.ka * material.color
+    diffuse = np.zeros((len(vertices), 3))
+    specular = np.zeros((len(vertices), 3))
+    
+    # Stack all light positions and colors
+    light_positions = np.stack([light.position for light in lights])  # [Nl, 3]
+    light_colors = np.stack([light.color * light.intensity for light in lights])  # [Nl, 3]
+    
+    # Calculate light directions and distances for all lights at once
+    light_dirs = light_positions[None, :, :] - vertices[:, None, :]  # [Nv, Nl, 3]
+    light_dists = np.linalg.norm(light_dirs, axis=2, keepdims=True)  # [Nv, Nl, 1]
+    light_dirs = light_dirs / light_dists  # [Nv, Nl, 3]
+    
+    # Attenuation factor for all lights
+    S = 1/(material.a + material.b * light_dists + material.c * light_dists ** 2)  # [Nv, Nl, 1]
+    
+    # Diffuse component for all lights
+    diffuse_intensities = np.maximum(0, np.sum(vertex_normals[:, None, :] * light_dirs, axis=2, keepdims=True))  # [Nv, Nl, 1]
+    diffuse = np.sum(material.kd * diffuse_intensities * light_colors[None, :, :] * S, axis=1)  # [Nv, 3]
+    
+    # Specular component for all lights
+    reflect_dirs = 2 * np.sum(vertex_normals[:, None, :] * light_dirs, axis=2, keepdims=True) * vertex_normals[:, None, :] - light_dirs  # [Nv, Nl, 3]
+    specular_intensities = np.maximum(0, np.sum(view_dirs[:, None, :] * reflect_dirs, axis=2, keepdims=True))  # [Nv, Nl, 1]
+    specular = np.sum(material.ks * (specular_intensities ** material.n) * light_colors[None, :, :] * S, axis=1)  # [Nv, 3]
+    
+    # Combine components and apply material color
+    vertex_colors = np.clip(ambient + diffuse + specular, 0, 1)
     
     return IlluminatedObject(object, vertex_colors)
 
