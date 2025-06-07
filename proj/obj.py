@@ -81,19 +81,24 @@ def Subdivide(mesh: Mesh, iterations: int = 1) -> Mesh:
         vertices = current_mesh.vertices
         faces = current_mesh.faces
         
-        # Create new vertices by splitting edges
-        new_vertices = []
-        edge_to_vertex = {}  # Map edge to new vertex index
+        # Get all edges from faces
+        edges = np.vstack([
+            faces[:, [0, 1]],
+            faces[:, [1, 2]],
+            faces[:, [2, 0]]
+        ])
+        edges = np.sort(edges, axis=1)  # Sort edges to ensure consistent ordering
         
-        for face in faces:
-            for i in range(3):
-                v1, v2 = face[i], face[(i + 1) % 3]
-                edge = tuple(sorted([v1, v2]))
-                if edge not in edge_to_vertex:
-                    # Create new vertex at midpoint
-                    mid = (vertices[v1] + vertices[v2]) / 2
-                    new_vertices.append(mid)
-                    edge_to_vertex[edge] = len(vertices) + len(new_vertices) - 1
+        # Get unique edges and their indices
+        unique_edges, edge_indices = np.unique(edges, axis=0, return_inverse=True)
+        
+        # Calculate midpoints for all unique edges
+        edge_vertices = vertices[unique_edges]
+        midpoints = np.mean(edge_vertices, axis=1)
+        
+        # Create mapping from original edges to new vertex indices
+        edge_to_vertex = {tuple(edge): idx + len(vertices) 
+                         for idx, edge in enumerate(unique_edges)}
         
         # Create new faces
         new_faces = []
@@ -114,7 +119,7 @@ def Subdivide(mesh: Mesh, iterations: int = 1) -> Mesh:
         
         # Create new mesh with subdivided geometry
         current_mesh = Mesh(
-            vertices=np.vstack([vertices, new_vertices]),
+            vertices=np.vstack([vertices, midpoints]),
             faces=np.array(new_faces),
             vertex_normals=None,
             face_normals=None,
