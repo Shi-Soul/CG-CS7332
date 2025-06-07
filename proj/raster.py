@@ -60,10 +60,20 @@ def ProjectScene(collapsed_scene: CollapsedScene)->np.ndarray:
     # Transform vertices to camera space
     camera_to_world = np.eye(4)
     camera_to_world[:3, 3] = camera.viewpoint
-    cross_direction = np.cross(camera.up, camera.direction)
-    camera_to_world[:3, :3] = np.column_stack([-camera.up, -cross_direction, camera.direction])
-    camera_to_world[:3, :3] /= np.linalg.norm(camera_to_world[:3, :3], axis=1, keepdims=True)
-    # camera_to_world[:3, :3] = np.column_stack([cross_direction, camera.up, camera.direction])
+    
+    # Normalize direction vector
+    dir = camera.direction / np.linalg.norm(camera.direction)
+    
+    # Make up vector orthogonal to direction
+    up = camera.up - np.dot(camera.up, dir) * dir
+    up = up / np.linalg.norm(up)
+    
+    # Calculate cross product for right vector
+    right = np.cross(up, dir)
+    right = right / np.linalg.norm(right)
+    
+    # Build camera basis matrix
+    camera_to_world[:3, :3] = np.column_stack([-right, -up, dir])
     
     world_to_camera = np.linalg.inv(camera_to_world)
     
@@ -127,10 +137,10 @@ def UpdateFace(face: np.ndarray, vertex_colors: np.ndarray, projected_vertices: 
     (min_x, max_x), (min_y, max_y) = bounding_box(face, projected_vertices)
     
     # Clip against screen boundaries
-    min_x = max(0, min_x)
-    max_x = min(frame_buffer.shape[1] - 1, max_x)
-    min_y = max(0, min_y)
-    max_y = min(frame_buffer.shape[0] - 1, max_y)
+    min_x = max(0, min(min_x, frame_buffer.shape[1] - 1))
+    max_x = max(0, min(max_x, frame_buffer.shape[1] - 1))
+    min_y = max(0, min(min_y, frame_buffer.shape[0] - 1))
+    max_y = max(0, min(max_y, frame_buffer.shape[0] - 1))
     
     # Create coordinate grids
     y_coords, x_coords = np.mgrid[min_y:max_y+1, min_x:max_x+1]
@@ -193,7 +203,8 @@ def DiscretizeFrameBuffer(frame_buffer: np.ndarray)->np.ndarray:
 def Rasterize(illuminated_scene: IlluminatedScene)->np.ndarray:
     collapsed_scene = CollapseScene(illuminated_scene)
     projected_vertices = ProjectScene(collapsed_scene)
-    
+    print(projected_vertices)
+        
     
     image_size = GetImageSize(illuminated_scene.camera)
     frame_buffer = np.zeros((image_size[1], image_size[0], 3)) # float, [H,W,3]
@@ -201,6 +212,5 @@ def Rasterize(illuminated_scene: IlluminatedScene)->np.ndarray:
     
     for face in collapsed_scene.faces:
         UpdateFace(face, collapsed_scene.vertex_colors, projected_vertices, frame_buffer, z_buffer)
-    print(projected_vertices)
     image = DiscretizeFrameBuffer(frame_buffer)
     return image
