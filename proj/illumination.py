@@ -58,7 +58,7 @@ def phong_illuminate_object(object: Object, lights: List[Light], camera: Camera)
         
         # Combine components and apply material color
         vertex_colors[i] = np.clip(ambient + diffuse + specular, 0, 1)
-    breakpoint()
+    # breakpoint()
     
     return IlluminatedObject(object, vertex_colors)
 

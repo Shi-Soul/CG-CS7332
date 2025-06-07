@@ -132,27 +132,56 @@ def UpdateFace(face: np.ndarray, vertex_colors: np.ndarray, projected_vertices: 
     min_y = max(0, min_y)
     max_y = min(frame_buffer.shape[0] - 1, max_y)
     
-    # Rasterize each pixel in bounding box
-    for y in range(min_y, max_y + 1):
-        for x in range(min_x, max_x + 1):
-            p = np.array([x, y])
-            
-            # Calculate barycentric coordinates
-            coords = barycentric_coords(p, face_vertices[0, :2], face_vertices[1, :2], face_vertices[2, :2])
-            
-            # Check if point is inside triangle
-            if np.all(coords >= 0) and np.all(coords <= 1):
-                # Interpolate z
-                z = coords.dot(face_vertices[:, 2])
-                
-                # Depth test
-                if z < z_buffer[y, x, 0]:
-                    # Interpolate color
-                    color = coords.dot(face_colors)
-                    
-                    # Update buffers
-                    frame_buffer[y, x] = color
-                    z_buffer[y, x, 0] = z
+    # Create coordinate grids
+    y_coords, x_coords = np.mgrid[min_y:max_y+1, min_x:max_x+1]
+    points = np.stack([x_coords, y_coords], axis=-1)
+    
+    # Reshape points for vectorized barycentric calculation
+    points_flat = points.reshape(-1, 2)
+    
+    # Calculate barycentric coordinates for all points
+    v0v1 = face_vertices[1, :2] - face_vertices[0, :2]
+    v0v2 = face_vertices[2, :2] - face_vertices[0, :2]
+    v0p = points_flat - face_vertices[0, :2]
+    
+    d00 = np.dot(v0v1, v0v1)
+    d01 = np.dot(v0v1, v0v2)
+    d11 = np.dot(v0v2, v0v2)
+    d20 = np.einsum('ij,j->i', v0p, v0v1)
+    d21 = np.einsum('ij,j->i', v0p, v0v2)
+    
+    denom = d00 * d11 - d01 * d01
+    v = (d11 * d20 - d01 * d21) / denom
+    w = (d00 * d21 - d01 * d20) / denom
+    u = 1.0 - v - w
+    
+    coords = np.stack([u, v, w], axis=1)
+    
+    # Check which points are inside triangle
+    mask = np.all(coords >= 0, axis=1) & np.all(coords <= 1, axis=1)
+    
+    if np.any(mask):
+        # Get valid points and their coordinates
+        valid_points = points_flat[mask]
+        valid_coords = coords[mask]
+        
+        # Calculate z values for valid points
+        z_values = np.dot(valid_coords, face_vertices[:, 2])
+        
+        # Calculate colors for valid points
+        colors = np.dot(valid_coords, face_colors)
+        
+        # Get corresponding buffer indices
+        y_indices = valid_points[:, 1].astype(int)
+        x_indices = valid_points[:, 0].astype(int)
+        
+        # Update buffers where depth test passes
+        depth_mask = z_values < z_buffer[y_indices, x_indices, 0].flatten()
+        
+        if np.any(depth_mask):
+            valid_indices = np.where(depth_mask)[0]
+            frame_buffer[y_indices[valid_indices], x_indices[valid_indices]] = colors[valid_indices]
+            z_buffer[y_indices[valid_indices], x_indices[valid_indices], 0] = z_values[valid_indices]
 
 
 def DiscretizeFrameBuffer(frame_buffer: np.ndarray)->np.ndarray:
