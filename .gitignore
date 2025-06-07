@@ -5,6 +5,7 @@
 *.blend1
 *.zip
 .vscode
+*.mp4
 
 *__pycache__*
 *.pyc
