@@ -18,11 +18,30 @@ def main():
         c=0.2,
         color=np.array([0.8, 0.8, 0.8])
     )
+    
+    material_ground = Material(
+        ka=0.15,
+        kd=1.0,
+        ks=0.8,
+        n=10.0,
+        a=1.0,
+        b=0.2,
+        c=0.2,
+        color=np.array([0.8, 0.8, 0.8])
+    )
 
-    cube = Object(
+    ground = Object(
+        mesh=Subdivide(
+            Cylinder(np.array([0, 0, -0.5]), 2, 0.01, 32),
+            1),
+        material=material_ground
+    )
+
+    obj = Object(
         mesh=Cone(np.array([0, 0, 0]), 0.5, 1, 32, 8),
         material=material
     )
+    objs = [ground, obj]
 
     lights = [
         Light(np.array([-0.7, -0.6, 0.8]), 0.7, np.array([1, 1.0, 1.0])),
@@ -34,7 +53,7 @@ def main():
     
     # Set up the scene
     scene = Scene(
-        objects=[cube],
+        objects=objs,
         lights=lights,
         camera=camera  # We'll set the camera later
     )
