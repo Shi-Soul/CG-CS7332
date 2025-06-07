@@ -6,45 +6,53 @@ from raster import Rasterize, GetImageSize
 from display import Display
 from time import sleep
 
-material = Material(
-    ka=0.1,
-    kd=0.7,
-    ks=0.5,
-    n=2,
-    a=1,
-    b=1,
-    c=1,
-    color=np.array([0.5, 0.5, 1])
-)
+def main():
 
-cube = Object(
-    mesh=Cube(np.array([0, 0, 0]), 1),
-    material=material
-)
+    material = Material(
+        ka=0.1,
+        kd=0.7,
+        ks=0.5,
+        n=2,
+        a=1,
+        b=1,
+        c=1,
+        color=np.array([0.5, 0.5, 1])
+    )
 
-light = Light(np.array([-2, -1.0, 1.2]), 1, np.array([1, 1, 1]))
+    cube = Object(
+        mesh=Cube(np.array([0, 0, 0]), 1),
+        material=material
+    )
 
-camera = Camera(np.array([-3, -3, 3]), np.array([1, 1, -1]), np.array([0, 0, 1]), 52, 1.5, 800)
+    light = Light(np.array([-2, -1.0, 1.2]), 1, np.array([1, 1, 1]))
 
-image_size = GetImageSize(camera)
+    camera = Camera(np.array([-3, -1, 2]), np.array([3, 1, -2]), np.array([0, 0, 1]), 52, 1.5, 800)
 
-
-
-scene = Scene(
-    objects=[cube],
-    lights=[light],
-    camera=camera
-)
+    image_size = GetImageSize(camera)
 
 
-illuminated_scene = Illuminate(scene)
 
-image = Rasterize(illuminated_scene)
-
-
-Display.init(*image_size, title="Phong Illumination")
-Display.record(0, image)
-print("Done")
+    scene = Scene(
+        objects=[cube],
+        lights=[light],
+        camera=camera
+    )
 
 
-sleep(3)
+    illuminated_scene = Illuminate(scene)
+
+    image = Rasterize(illuminated_scene)
+
+
+
+    Display.init(*image_size, title="Phong Illumination")
+    Display.record(0, image)
+    print("Done")
+
+
+    sleep(3)
+    
+    
+    
+if __name__ == "__main__":
+    main()
