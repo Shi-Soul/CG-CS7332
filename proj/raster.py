@@ -84,7 +84,7 @@ def ProjectScene(collapsed_scene: CollapsedScene)->np.ndarray:
     vertices_camera = (world_to_camera @ vertices_h.T).T[:, :3]
     
     # Project to image plane
-    f = camera.resolution / np.tan(camera.fov / 2)
+    f = camera.resolution / np.tan(camera.fov * np.pi / 360)
     vertices_projected = vertices_camera * f / vertices_camera[:, 2:]
     
     # Convert to image coordinates

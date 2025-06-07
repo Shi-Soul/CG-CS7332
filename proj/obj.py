@@ -20,7 +20,6 @@ class Material:
     c: float            # phong exponent c
     color: np.ndarray   # [3] rgb color, 0 <= color <= 1
 
-
 @dataclass
 class Mesh:
     vertices: np.ndarray      # [Nv, 3] vertex positions
@@ -64,7 +63,6 @@ class Object:
     mesh: Mesh
 
 
-
 def Subdivide(mesh: Mesh, iterations: int = 1) -> Mesh:
     """Subdivide the mesh by splitting each triangle into 4 smaller triangles
     
@@ -80,6 +78,7 @@ def Subdivide(mesh: Mesh, iterations: int = 1) -> Mesh:
     for _ in range(iterations):
         vertices = current_mesh.vertices
         faces = current_mesh.faces
+        face_normals = current_mesh.face_normals
         
         # Get all edges from faces
         edges = np.vstack([
@@ -161,12 +160,12 @@ def Cube(center: np.ndarray, size: float) -> Mesh:
     
     # Define 12 triangles (6 faces)
     faces = np.array([
-        [0, 1, 2], [0, 2, 3],  # front
-        [4, 5, 6], [4, 6, 7],  # back
-        [0, 4, 7], [0, 7, 3],  # left
-        [1, 5, 6], [1, 6, 2],  # right
-        [0, 1, 5], [0, 5, 4],  # bottom
-        [3, 2, 6], [3, 6, 7],  # top
+        [0, 2, 1], [0, 3, 2],  # bottom
+        [4, 5, 6], [4, 6, 7],  # top
+        [0, 4, 7], [0, 7, 3],  # back
+        [1, 6, 5], [1, 2, 6],  # front
+        [0, 1, 5], [0, 5, 4],  # left
+        [3, 6, 2], [3, 7, 6],  # right
     ])
     
     mesh = Mesh(
@@ -202,7 +201,8 @@ def Sphere(center: np.ndarray, radius: float, segments: int = 16) -> Mesh:
             p2 = i * segments + (j + 1) % segments
             p3 = (i + 1) * segments + j
             p4 = (i + 1) * segments + (j + 1) % segments
-            faces.extend([[p1, p2, p3], [p2, p4, p3]])
+            faces.extend([[p1, p3, p2], [p2, p3, p4]])
+            # faces.extend([[p1, p2, p3], [p2, p4, p3]])
     faces = np.array(faces)
 
     mesh = Mesh(
