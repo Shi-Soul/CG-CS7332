@@ -45,17 +45,20 @@ def phong_illuminate_object(object: Object, lights: List[Light], camera: Camera)
             light_dist = np.linalg.norm(light_dir)
             light_dir = light_dir / light_dist
             
+            S = 1/(material.a  + material.b * light_dist + material.c * light_dist ** 2)
+            
             # Diffuse component
             diffuse_intensity = max(0, np.dot(normal, light_dir))
-            diffuse += material.kd * diffuse_intensity * light.color * light.intensity / (light_dist ** 2)
+            diffuse += material.kd * diffuse_intensity * light.color * light.intensity * S
             
             # Specular component
             reflect_dir = 2 * np.dot(normal, light_dir) * normal - light_dir
             specular_intensity = max(0, np.dot(view_dir, reflect_dir))
-            specular += material.ks * (specular_intensity ** material.a) * light.color * light.intensity / (light_dist ** 2)
+            specular += material.ks * (specular_intensity ** material.n) * light.color * light.intensity * S
         
         # Combine components and apply material color
         vertex_colors[i] = np.clip(ambient + diffuse + specular, 0, 1)
+    breakpoint()
     
     return IlluminatedObject(object, vertex_colors)
 

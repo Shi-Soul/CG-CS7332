@@ -8,12 +8,13 @@ from time import sleep
 
 material = Material(
     ka=0.1,
-    kd=0.5,
+    kd=0.7,
     ks=0.5,
-    a=10,
-    b=10,
-    c=10,
-    color=np.array([1, 1, 1])
+    n=2,
+    a=1,
+    b=1,
+    c=1,
+    color=np.array([0.5, 0.5, 1])
 )
 
 cube = Object(
@@ -21,7 +22,7 @@ cube = Object(
     material=material
 )
 
-light = Light(np.array([-2, -1.5, 1.2]), 1, np.array([1, 1, 1]))
+light = Light(np.array([-2, -1.0, 1.2]), 1, np.array([1, 1, 1]))
 
 camera = Camera(np.array([-3, -3, 3]), np.array([1, 1, -1]), np.array([0, 0, 1]), 52, 1.5, 800)
 
@@ -40,12 +41,10 @@ illuminated_scene = Illuminate(scene)
 
 image = Rasterize(illuminated_scene)
 
-# image = np.zeros((image_size[1], image_size[0], 3), dtype=np.uint8)
-
 
 Display.init(*image_size, title="Phong Illumination")
-Display.show(image)
+Display.record(0, image)
 print("Done")
 
 
-sleep(10)
+sleep(3)

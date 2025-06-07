@@ -14,6 +14,7 @@ class Material:
     ka: float           # ambient coefficient
     kd: float           # diffuse coefficient  
     ks: float           # specular coefficient
+    n: float            # shininess
     a: float            # phong exponent a
     b: float            # phong exponent b
     c: float            # phong exponent c
