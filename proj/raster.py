@@ -161,6 +161,11 @@ def UpdateFace(face: np.ndarray, vertex_colors: np.ndarray, projected_vertices: 
     d21 = np.einsum('ij,j->i', v0p, v0v2)
     
     denom = d00 * d11 - d01 * d01
+    
+    # Handle case where denom is close to zero
+    if abs(denom) < 1e-10:
+        return  # Skip this face as it's degenerate
+    
     v = (d11 * d20 - d01 * d21) / denom
     w = (d00 * d21 - d01 * d20) / denom
     u = 1.0 - v - w
@@ -192,7 +197,6 @@ def UpdateFace(face: np.ndarray, vertex_colors: np.ndarray, projected_vertices: 
             valid_indices = np.where(depth_mask)[0]
             frame_buffer[y_indices[valid_indices], x_indices[valid_indices]] = colors[valid_indices]
             z_buffer[y_indices[valid_indices], x_indices[valid_indices], 0] = z_values[valid_indices]
-
 
 def DiscretizeFrameBuffer(frame_buffer: np.ndarray)->np.ndarray:
     # Return the discretized frame buffer
