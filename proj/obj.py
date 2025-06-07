@@ -335,3 +335,43 @@ def Polyhedron(vertices: np.ndarray, faces: np.ndarray) -> Mesh:
         face_normals=None,
         _str_=f"Polyhedron(vertices={len(vertices)}, faces={len(faces)})"
     ).compute_normals()
+
+
+def ConvexHull(points: np.ndarray) -> Mesh:
+    """Create a convex hull mesh from a set of points
+    
+    Args:
+        points: Array of point positions [Np, 3]
+        
+    Returns:
+        Mesh object representing the convex hull
+    """
+    from scipy.spatial import ConvexHull as scipy_ConvexHull
+    
+    # Compute convex hull using scipy
+    hull = scipy_ConvexHull(points)
+    
+    hull_origin = np.mean(points, axis=0)
+    
+    # Ensure faces have correct winding order
+    faces = hull.simplices.copy()
+    for i, face in enumerate(faces):
+        # Get face vertices
+        v0, v1, v2 = points[face]
+        # Calculate face normal
+        normal = np.cross(v1 - v0, v2 - v0)
+        # Calculate vector from face center to origin
+        center = (v0 + v1 + v2) / 3
+        to_origin = center - hull_origin
+        # If normal points inward, reverse face winding
+        if np.dot(normal, to_origin) < 0:
+            faces[i] = face[::-1]
+    
+    # Create mesh from hull vertices and faces
+    return Mesh(
+        vertices=points,
+        faces=faces,
+        vertex_normals=None,
+        face_normals=None,
+        _str_=f"ConvexHull(points={len(points)})"
+    ).compute_normals()

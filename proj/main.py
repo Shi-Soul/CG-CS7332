@@ -14,12 +14,12 @@ def main():
         ks=0.8,
         n=10.0,
         a=1.0,
-        b=0.35,
-        c=0.44,
+        b=0.2,
+        c=0.2,
         color=np.array([0.2, 0.2, 0.8])
     )
     material_blue = Material(
-        ka=0.2,
+        ka=0.15,
         kd=1.0,
         ks=0.8,
         n=10.0,
@@ -31,8 +31,12 @@ def main():
 
     cube = Object(
         mesh=
+            Subdivide(
+                ConvexHull(np.array([[0, 0, -0.5], [1, 0, -0.5], [0, 1, -0.5], [1, 1, -0.5], 
+                                     [0, 0, 0.1], [1, 0, 0.5], [0.3, 0.3, 0.4]])),
+            4),
             # Subdivide(
-                Cone(np.array([0, 0, 0]), 0.5, 1, 32, 8),
+            # Cone(np.array([0, 0, 0]), 0.5, 1, 32, 8),
             # 3),
             # Subdivide(
             #     Cylinder(np.array([0, 0, 0]), 0.5, 1, 32),
