@@ -10,9 +10,10 @@ material = Material(
     ka=0.1,
     kd=0.5,
     ks=0.5,
-    a=10,
-    b=10,
-    c=10,
+    n=2,
+    a=1,
+    b=1,
+    c=1,
     color=np.array([1, 1, 1])
 )
 
