@@ -80,17 +80,16 @@ def main():
 
 
         # Change the core context of the scene
-        
-        ratio = (np.sin((2 * np.pi) * R * i / num_frames) + 1) / 2
-        material.ks = ratio  # Gradually increase ka from 0.15 to 0.5
+        phase = ((2 * np.pi) * R * i / num_frames)
+        # ratio = (np.sin(phase) + 1) / 2
+        # material.ks = ratio  # Gradually increase ka from 0.15 to 0.5
         
         # ratio = i / num_frames
         # lights[1].color = np.array([1-ratio, 0, ratio])
         
-        # angle = (2 * np.pi) * R * ratio  # Full rotation
-        # observer = np.array([radius * np.cos(angle), radius * np.sin(angle), 2.5])
-        # camera = Camera(observer, -observer, np.array([0, 0, 1]), 60, 1.5, 800)
-        # scene.camera = camera
+        observer = np.array([radius * np.cos(phase), radius * np.sin(phase), 2.5])
+        camera = Camera(observer, -observer, np.array([0, 0, 1]), 60, 1.5, 800)
+        scene.camera = camera
         
         
         
