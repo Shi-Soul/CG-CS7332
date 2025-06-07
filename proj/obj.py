@@ -78,7 +78,6 @@ def Subdivide(mesh: Mesh, iterations: int = 1) -> Mesh:
     for _ in range(iterations):
         vertices = current_mesh.vertices
         faces = current_mesh.faces
-        face_normals = current_mesh.face_normals
         
         # Get all edges from faces
         edges = np.vstack([
@@ -124,7 +123,7 @@ def Subdivide(mesh: Mesh, iterations: int = 1) -> Mesh:
             face_normals=None,
             _str_=f"Subdivided({current_mesh._str_})"
         )
-        current_mesh.compute_normals()
+    current_mesh.compute_normals()
     
     return current_mesh
 
@@ -270,39 +269,58 @@ def Cylinder(center: np.ndarray, radius: float, height: float, segments: int = 1
     mesh.compute_normals()
     return mesh
 
-
-def Cone(center, radius, height, segments=16) -> Mesh:
-    mesh = Mesh()
+def Cone(center, radius, height, segments=16, vertical_segments=1) -> Mesh:
     # Generate vertices
     vertices = []
-    # Base circle
-    for i in range(segments):
-        theta = 2 * np.pi * i / segments
-        x = center[0] + radius * np.cos(theta)
-        y = center[1] + radius * np.sin(theta)
-        z = center[2] - height/2
-        vertices.append([x, y, z])
-    # Apex
-    vertices.append([center[0], center[1], center[2] + height/2])
-    # Base center
+    
+    # Generate vertices for each vertical level
+    for v in range(vertical_segments + 1):
+        # Calculate radius at this height (decreases linearly from base to apex)
+        current_radius = radius * (1 - v/vertical_segments)
+        current_height = center[2] - height/2 + (height * v/vertical_segments)
+        
+        # Generate circle at this height
+        for i in range(segments):
+            theta = 2 * np.pi * i / segments
+            x = center[0] + current_radius * np.cos(theta)
+            y = center[1] + current_radius * np.sin(theta)
+            z = current_height
+            vertices.append([x, y, z])
+    
+    # Add base center
     vertices.append([center[0], center[1], center[2] - height/2])
-    mesh.vertices = np.array(vertices)
-
+    vertices = np.array(vertices)
+    
     # Generate faces
     faces = []
-    apex = len(vertices) - 2
     base_center = len(vertices) - 1
-    # Side faces
-    for i in range(segments):
-        i2 = (i + 1) % segments
-        faces.append([i, i2, apex])
-    # Base cap
+    
+    # Generate side faces
+    for v in range(vertical_segments):
+        for i in range(segments):
+            i2 = (i + 1) % segments
+            # Get indices for current and next level
+            curr_level = v * segments
+            next_level = (v + 1) * segments
+            
+            # Create two triangles for each quad
+            faces.extend([
+                [curr_level + i, curr_level + i2, next_level + i],
+                [curr_level + i2, next_level + i2, next_level + i]
+            ])
+    
+    # Generate base cap
     for i in range(segments):
         i2 = (i + 1) % segments
         faces.append([base_center, i2, i])
     
-    mesh.faces = np.array(faces)
-    mesh._str_ = f"Cone(center={center}, radius={radius}, height={height}, segments={segments})"
+    mesh = Mesh(
+        vertices=vertices,
+        faces=np.array(faces),
+        vertex_normals=None,
+        face_normals=None,
+        _str_=f"Cone(center={center}, radius={radius}, height={height}, segments={segments}, vertical_segments={vertical_segments})"
+    )
     mesh.compute_normals()
     return mesh
 
