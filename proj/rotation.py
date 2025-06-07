@@ -28,7 +28,9 @@ def main():
         Light(np.array([-0.7, -0.6, 0.8]), 0.7, np.array([1, 1.0, 1.0])),
         Light(np.array([-0.4, +0.2, 0.5]), 1, np.array([1, 0.0, 0])),
     ]
-    camera = Camera(np.array([0, 0, 0]), np.array([0, 0, 1]), np.array([0, 0, 1]), 60, 1.5, 800)
+    normalize = lambda x: x / np.linalg.norm(x)
+    observer = normalize(np.array([-5, -3.5, 3])) * 2.5
+    camera = Camera(observer, -observer, np.array([0, 0, 1]), 60, 1.5, 800)
     
     # Set up the scene
     scene = Scene(
@@ -40,13 +42,13 @@ def main():
     # Video settings
     frame_shape = GetImageSize(camera)
     frame_width, frame_height = frame_shape
-    video_filename = 'camera_rotation.mp4'
+    video_filename = 'rotation.mp4'
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(video_filename, fourcc, 30.0, (frame_width, frame_height))
 
     # Rotate the camera around the object
     T = 4.0  # Total duration in seconds
-    R = 3.0  # Number of rotations
+    R = 1.0  # Number of rotations
     num_frames = int(T * 30)  # 30 FPS
     radius = 5.0  # Distance from the object
     for i in range(num_frames):
@@ -57,11 +59,21 @@ def main():
         bar = '█' * filled_length + '░' * (bar_length - filled_length)
         print(f'\rProgress: [{bar}] {progress:.1%}', end='')
 
+
         # Change the core context of the scene
-        angle = (2 * np.pi) * R * i / num_frames  # Full rotation
-        observer = np.array([radius * np.cos(angle), radius * np.sin(angle), 2.5])
-        camera = Camera(observer, -observer, np.array([0, 0, 1]), 60, 1.5, 800)
-        scene.camera = camera
+        
+        ratio = (np.sin((2 * np.pi) * R * i / num_frames) + 1) / 2
+        material.ks = ratio  # Gradually increase ka from 0.15 to 0.5
+        
+        # ratio = i / num_frames
+        # lights[1].color = np.array([1-ratio, 0, ratio])
+        
+        # angle = (2 * np.pi) * R * ratio  # Full rotation
+        # observer = np.array([radius * np.cos(angle), radius * np.sin(angle), 2.5])
+        # camera = Camera(observer, -observer, np.array([0, 0, 1]), 60, 1.5, 800)
+        # scene.camera = camera
+        
+        
         
         # Render the scene
         illuminated_scene = Illuminate(scene)
