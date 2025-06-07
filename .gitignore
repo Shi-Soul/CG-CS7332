@@ -4,7 +4,7 @@
 
 *.blend1
 *.zip
-
+.vscode
 
 *__pycache__*
 *.pyc

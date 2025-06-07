@@ -10,23 +10,27 @@ def main():
 
     material = Material(
         ka=0.1,
-        kd=0.7,
-        ks=0.5,
-        n=2,
-        a=1,
-        b=1,
-        c=1,
+        kd=0.5,
+        ks=0.7,
+        n=1.2,
+        a=0.1,
+        b=1.0,
+        c=1.0,
         color=np.array([0.5, 0.5, 1])
     )
 
     cube = Object(
-        mesh=Cube(np.array([0, 0, 0]), 1),
+        mesh=
+            Subdivide(
+                Cube(np.array([0, 0, 0]), 1), 
+            3),
         material=material
     )
 
-    light = Light(np.array([-2, -1.0, 1.2]), 1, np.array([1, 1, 1]))
+    light = Light(np.array([-0.7, -0.6, 0.6]), 1, np.array([1, 1, 1]))
 
-    camera = Camera(np.array([-3, -1, 2]), np.array([3, 1, -2]), np.array([0, 0, 1]), 52, 1.5, 800)
+    observer = np.array([-5, -3.5, 3])/3
+    camera = Camera(observer, -observer, np.array([0, 0, 1]), 52, 1.5, 800)
 
     image_size = GetImageSize(camera)
 
