@@ -38,7 +38,9 @@ def main():
     )
 
     obj = Object(
-        mesh=Cone(np.array([0, 0, 0]), 0.5, 1, 32, 8),
+        mesh=
+            # Cone(np.array([0, 0, 0]), 0.5, 1, 32, 8),
+            Sphere(np.array([0, 0, 0]), 0.5, 32),
         material=material
     )
     objs = [ground, obj]
